@@ -1,0 +1,66 @@
+<%- include('./partials/header') %>
+
+<body>
+
+    <%- include('./partials/section') %>
+
+    <div class="container mt-5 w-50">
+        <form>
+            <legend class="text-center border border-primary border-2 rounded mb-5">
+                Create a product
+            </legend>
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>              
+                <input type="text" class="form-control" name="description" placeholder="Describe the product" maxlength="30" />              
+            </div>
+            <div class="mb-3">
+                <label for="quantity" class="form-label">Quantity</label>              
+                <input type="number" class="form-control" name="quantity" placeholder="Quantity of product" />
+            </div>
+            <a href="/" class="btn btn-danger float-start mt-3">
+                <i class="bi bi-x-circle"></i> Cancel Save
+            </a>
+            <button type="submit" class="btn btn-primary float-end mt-3">
+                <i class="bi bi-device-hdd"></i> Save Product
+            </button>
+          </form>          
+    </div>
+
+    <div class="container w-50">
+        <div class="alert alert-danger mt-3 w-75 float-end fw-bold d-none">Please, fill out all fields</div>
+    </div>
+
+    <script>
+
+        const form = document.querySelector('form')        
+             
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault()            
+            const description = form.description.value.trim()
+            const quantity = form.quantity.value.trim()
+            if(description === '' || quantity === '') {
+                const message = document.querySelectorAll('.alert')[0]
+                message.classList.remove('d-none')
+                return
+            }
+            try {
+                const res = await fetch('/product', {
+                    method: 'POST',
+                    body: JSON.stringify({ description, quantity }),
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                const data = await res.json()
+                if(data) {                                    
+                    location.assign('/')
+                }
+            } 
+            catch (error) {
+                console.log(error)                    
+            }
+        })
+
+    </script>
+    
+</body>
+
+</html>
