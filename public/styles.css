@@ -1,0 +1,8 @@
+a {
+    text-decoration: none;
+}
+
+table tbody tr:hover {
+    background-color: #0d6efd;
+    color: #fff;
+}
