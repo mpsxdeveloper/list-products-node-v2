@@ -1,0 +1,68 @@
+<%- include('./partials/header') %>
+
+<body>
+
+    <%- include('./partials/section') %>
+
+    <div class="container mt-5 w-50">
+        <form>
+            <legend class="text-center border border-primary border-2 rounded mb-5">
+                Edit a product
+            </legend>
+            <input type="hidden" name="id" value="<%= product.id %>" />
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>              
+                <input type="text" class="form-control" name="description" placeholder="Describe the product" value="<%= product.description %>" maxlength="30" />              
+            </div>
+            <div class="mb-3">
+                <label for="quantity" class="form-label">Quantity</label>              
+                <input type="number" class="form-control" name="quantity" placeholder="Quantity of product" value="<%= product.quantity %>" />
+            </div>
+            <a href="/" class="btn btn-danger float-start mt-3">
+                <i class="bi bi-x-circle"></i> Cancel Edit
+            </a>
+            <button type="submit" class="btn btn-primary float-end mt-3">
+                <i class="bi bi-pencil"></i> Edit Product
+            </button>
+          </form>
+    </div>
+
+    <div class="container w-50">
+        <div class="alert alert-danger mt-3 w-75 float-end fw-bold d-none">Please, fill out all fields</div>
+    </div>
+
+    <script>
+
+        const form = document.querySelector('form')
+             
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault()
+            const id = form.id.value
+            const description = form.description.value
+            const quantity = form.quantity.value
+            if(description.trim() === '' || quantity.trim() === '') {
+                const message = document.querySelectorAll('.alert')[0]
+                message.classList.remove('d-none')
+                return
+            }
+            try {
+                const res = await fetch('/product', {
+                    method: 'PUT',
+                    body: JSON.stringify({ id, description, quantity }),
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                const data = await res.json()
+                if(data) {                                    
+                    location.assign('/')
+                }
+            } 
+            catch (error) {            
+                console.log(error)
+            }
+        })
+
+    </script>
+    
+</body>
+
+</html>
