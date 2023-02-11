@@ -1,0 +1,117 @@
+<%- include('./partials/header'); %>
+
+<body>
+
+    <%- include('./partials/section'); %>
+
+    <div class="container w-50">
+        <div class="row mb-3 mt-3">
+            <div class="col-9">
+                <div class="input-group">                
+                    <input type="text" class="form-control" placeholder="Search product" id="searchInput" />
+                    <button class="btn btn-outline-secondary" type="button" id="searchBtn">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </div>            
+            <div class="col-3">
+                <a href="/product" class="btn btn-success float-end">
+                    <i class="bi bi-plus"></i> New product
+                </a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="alert alert-danger mt-3 w-75 float-end fw-bold d-none">Your search didn't return any products</div>
+            </div>
+        </div>        
+        <% if(products.length > 0) { %>
+            <table class="table table-sm">            
+                <thead>
+                    <tr>                    
+                        <th scope="col">Description</th>
+                        <th scope="col">Quantity</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>                
+                    <% products.forEach(function(product) { %>
+                        <tr>                            
+                            <td><%= product.description %></td>
+                            <td><%= product.quantity %></td>
+                            <td colspan="2">
+                                <a href="/product/<%= product.id %>" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i> Edit</a>
+                                <a href="/product/delete/<%= product.id %>" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i> Delete</a>
+                            </td>
+                        </tr>                    
+                    <% }) %>
+                </tbody>
+            </table>
+        <% } else { %>
+            <div class="alert alert-danger mt-3 w-75 float-end fw-bold">There are not products registered yet</div>
+        <% } %>
+    </div>
+
+    <script>
+
+        const btn = document.querySelector('#searchBtn')
+
+        btn.addEventListener('click', async (e) => {            
+            
+            const slug = document.querySelector('#searchInput').value
+
+            if(slug.trim() === '') {
+                return                 
+            }
+                   
+            try {                
+                const res = await fetch('/product/search/' + slug, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                const data = await res.json()
+                const table = document.querySelector('table')
+                const tbody = document.querySelector('tbody')
+                const message = document.querySelectorAll('.alert')[0]
+                if(data.products!= null) {
+                    message.classList.add('d-none')
+                    table.innerHTML = '';
+                    let thead = table.insertRow()                    
+                    thead.insertCell().innerHTML = '<b><th>Description</th></b>'                    
+                    thead.insertCell().innerHTML = '<b><th>Quantity</th></b>'
+                    thead.insertCell().innerHTML = '<b><th colspan="2">Actions</th></b>'
+                    data.products.forEach(product => {
+                        const row = table.insertRow()
+                        const cellDescription = row.insertCell()
+                        cellDescription.innerHTML = product.description
+                        const cellQuantity = row.insertCell()
+                        cellQuantity.innerHTML = product.quantity
+                        const cellActions = row.insertCell()
+                        const linkEdit = document.createElement('a')
+                        linkEdit.href = `/product/${product.id}`
+                        linkEdit.classList.add('btn', 'btn-sm', 'btn-warning')
+                        linkEdit.innerHTML = `<i class="bi bi-pencil"></i> Edit`                        
+                        cellActions.appendChild(linkEdit)
+                        const linkDelete = document.createElement('a')
+                        linkDelete.href = `/product/delete/${product.id}`
+                        linkDelete.classList.add('btn', 'btn-sm', 'btn-danger', 'ms-1')
+                        linkDelete.innerHTML = `<i class="bi bi-trash"></i> Delete`                        
+                        cellActions.appendChild(linkDelete)
+                    })
+                }
+                else {                    
+                    message.classList.remove('d-none')
+                    table.innerHTML = ''
+                }               
+            }
+            catch (error) {
+                console.log(error)
+            }
+
+        })
+
+    </script>
+    
+</body>
+
+</html>
